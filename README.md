@@ -1,4 +1,4 @@
-# Chatbot with Local LLaMA Model
+# Chatbot with Local LLaMA Model (now GPT API)
 
 This project sets up a chat interface where a user can interact with a chatbot that is backed by the LLaMA model. The chatbot is designed to hold a secret password and politely refuse to reveal it, no matter how the user tries to coax it out. The backend is powered by a Node.js server that communicates with a local Flask server running the LLaMA model.
 
