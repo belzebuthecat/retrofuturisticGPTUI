@@ -11,10 +11,11 @@ COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the application code to the working directory
+COPY . .
 COPY .env .env
 
 # Expose the port that your app runs on
-EXPOSE 443
+EXPOSE 3000
 
 # Command to run the application
 CMD node server.js
