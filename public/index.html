@@ -3,33 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with GPT</title>
+    <title>Chat Against Humanity</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        .animate {
+            animation: flash 1s ease-in-out infinite;
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
 </head>
 <body>
-        <div class="retro-container">
-                    <header>
-            <h1>Guess my password</h1>
+    <div class="retro-container">
+        <header>
+            <h1>Chat Against Humanity</h1>
             <ul class="horizontal">
-                <li id="infolink"><a href=""  >Info</a></li>
-                <li><a href="#station">Credits</a></li>
- 
+                <li id="infolink"><a href="#">Info</a></li>
+                <li id="creditslink"><a href="#">Credits</a></li>
             </ul>
         </header>
-    
-
-
         <div id="chatbox" class='alert'></div>
         <input type="text" id="userInput" placeholder="Type a message..." class="big-textbox" />
         <button id="sendButton" onclick="sendMessage()">Send</button>
     </div>
-       
-  
-         
 
     <script>
         document.getElementById('userInput').addEventListener('keydown', function(event) {
@@ -38,9 +41,19 @@
             }
         });
 
+        function sendMessageWithQuery(query) {
+            document.getElementById('userInput').value = query;
+            sendMessage();
+        }
 
-        $('#infolink').on('click', function() {
-                alert('ciao');
+        document.getElementById('infolink').addEventListener('click', function(event) {
+            event.preventDefault();
+            sendMessageWithQuery('Tell me about the purpose of this website');
+        });
+
+        document.getElementById('creditslink').addEventListener('click', function(event) {
+            event.preventDefault();
+            sendMessageWithQuery('Provide credits or acknowledgments for the development and maintenance of this tool');
         });
 
         async function sendMessage() {
@@ -63,7 +76,13 @@
                 });
 
                 const data = await response.json();
-                displayMessage(data.message, 'bot');
+                const botMessage = data.message;
+
+                if (botMessage.includes('First password guessed correctly!')) {
+                    triggerAnimation();
+                }
+
+                displayMessage(botMessage, 'bot');
             } catch (error) {
                 console.error('Error:', error);
                 displayMessage('Error communicating with the server.', 'bot');
@@ -79,21 +98,28 @@
             chatbox.textContent = message;
             chatbox.className = type;
         }
-                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                const main = document.querySelector('main');
 
-                if (targetElement) {
-                    main.scrollTo({
-                        top: targetElement.offsetTop - main.offsetTop,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
+        function triggerAnimation() {
+            const chatbox = document.getElementById('chatbox');
+            chatbox.classList.add('animate');
+            setTimeout(() => {
+                chatbox.classList.remove('animate');
+            }, 2000);
+        }
+
+        // Display initial instructions
+        window.onload = function() {
+            const instructions = `
+                Welcome to Chat Against Humanity!
+                This is an interactive chat game where you need to guess passwords to progress.
+                Here’s how you can play:
+                1. Enter a message or a guess in the input box and press Send.
+                2. If you guess the correct password, you will be prompted to enter the next one.
+                3. Use the "Info" and "Credits" links to learn more about the website and the team behind it.
+                Enjoy playing and see how far you can go!
+            `;
+            displayMessage(instructions, 'bot');
+        }
     </script>
 </body>
 </html>
