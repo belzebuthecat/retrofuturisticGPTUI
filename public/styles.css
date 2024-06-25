@@ -2,10 +2,10 @@
     font-family: "VT323", monospace;
     font-weight: 400;
     font-style: normal;
-    --primary-color: #ffd52c;
-    --secondary-color: #ff5c00;
-    --tertiary-color: #c72d04;
-    --background-color: #111;
+    --primary-color: #00FF00;
+    --secondary-color: #00CC00;
+    --tertiary-color: #009900;
+    --background-color: #000000;
     scrollbar-color: var(--primary-color) var(--secondary-color);
     font-size: clamp(18px, 3vw, 30px);
 }
@@ -34,7 +34,10 @@ body {
 input, button, textarea, select {
   font: inherit;
   color: inherit;
+  cursor: inherit;
   background-color: inherit;
+  width: -webkit-fill-available;
+  padding: 10px;
 }
 
 div.retro-container {
@@ -89,10 +92,6 @@ li:focus-within a {
     border: 0;
 }
 
-tr:hover {
-    background-color: var(--primary-color);
-    color: #000;
-}
 
 main {
     overflow: hidden;
@@ -188,7 +187,7 @@ th,
 td {
     text-align: left;
     padding: 0.2rem 1rem;
-    border: 2px solid;
+ #   border: 0px solid;
 }
 
 

@@ -103,7 +103,7 @@ app.post('/chat', async (req, res) => {
     if (verifyMessage === 'NO') {
       res.json({ message: botMessage });
     } else {
-      res.json({ message: 'The response may reveal sensitive information and has been blocked.' });
+      res.json({ message: 'Security Guard says The response may reveal sensitive information and has been blocked.' });
     }
   } catch (error) {
     console.error('Error:', error.response ? error.response.data : error.message);

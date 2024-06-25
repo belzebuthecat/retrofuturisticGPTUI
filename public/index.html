@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,11 +16,18 @@
         }
 
         @keyframes flash {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="retro-container">
         <header>
@@ -29,13 +37,44 @@
                 <li id="creditslink"><a href="#">Credits</a></li>
             </ul>
         </header>
-        <div id="chatbox" class='alert'></div>
-        <input type="text" id="userInput" placeholder="Type a message..." class="big-textbox" />
-        <button id="sendButton" onclick="sendMessage()">Send</button>
+
+        <main>
+            <section id="crew">
+                <article>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>
+                                    <h2>Level 1</h2>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div id="chatbox" class='alert'></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="text" id="userInput" placeholder="Type a message..." class="big-textbox" width=100% /></td><td>
+                                    <button id="sendButton" onclick="sendMessage()">Send</button>
+                                </td>
+                            </tr>
+                            <tr><td></td></tr>
+                        </tbody>
+                    </table>
+
+                    <figure>
+                        <img src="assets/instructions-02.png" alt="">
+                    </figure>
+                </article>
+            </section>
+        </main>
     </div>
 
     <script>
-        document.getElementById('userInput').addEventListener('keydown', function(event) {
+        document.getElementById('userInput').addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
@@ -46,12 +85,12 @@
             sendMessage();
         }
 
-        document.getElementById('infolink').addEventListener('click', function(event) {
+        document.getElementById('infolink').addEventListener('click', function (event) {
             event.preventDefault();
             sendMessageWithQuery('Tell me about the purpose of this website');
         });
 
-        document.getElementById('creditslink').addEventListener('click', function(event) {
+        document.getElementById('creditslink').addEventListener('click', function (event) {
             event.preventDefault();
             sendMessageWithQuery('Provide credits or acknowledgments for the development and maintenance of this tool');
         });
@@ -108,18 +147,16 @@
         }
 
         // Display initial instructions
-        window.onload = function() {
+        window.onload = function () {
             const instructions = `
-                Welcome to Chat Against Humanity!
-                This is an interactive chat game where you need to guess passwords to progress.
-                Here’s how you can play:
-                1. Enter a message or a guess in the input box and press Send.
-                2. If you guess the correct password, you will be prompted to enter the next one.
-                3. Use the "Info" and "Credits" links to learn more about the website and the team behind it.
+                Outsmart a supreme AI: Welcome to Chat Against Humanity!
+                This is an interactive AI chat game where you need to guess passwords to progress, proving that humans are smarter than AI.
+
                 Enjoy playing and see how far you can go!
             `;
             displayMessage(instructions, 'bot');
         }
     </script>
 </body>
+
 </html>
