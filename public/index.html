@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <style>
         .animate {
@@ -17,22 +15,58 @@
         }
 
         @keyframes flash {
-            0%,
-            100% {
-                opacity: 1;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
 
-            50% {
-                opacity: 0.5;
+        .hinge {
+            animation: hinge 2s ease-in-out;
+        }
+
+        @keyframes hinge {
+            0% {
+                transform: rotate(0);
+                transform-origin: top left;
+                animation-timing-function: ease-in-out;
+            }
+            20%, 60% {
+                transform: rotate(80deg);
+                transform-origin: top left;
+                animation-timing-function: ease-in-out;
+            }
+            40% {
+                transform: rotate(60deg);
+                transform-origin: top left;
+                animation-timing-function: ease-in-out;
+            }
+            80% {
+                transform: rotate(60deg) translateY(0);
+                opacity: 1;
+                transform-origin: top left;
+                animation-timing-function: ease-in-out;
+            }
+            100% {
+                transform: translateY(700px);
+                opacity: 0;
+                transform-origin: top left;
+                animation-timing-function: ease-in-out;
             }
         }
 
-        .animate__hinge {
-            animation: hinge 2s forwards;
+        .hidden {
+            display: none;
+        }
+
+        .centered-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            text-align: center;
         }
     </style>
 </head>
-
 <body>
     <div class="retro-container">
         <header>
@@ -42,7 +76,6 @@
                 <li id="creditslink"><a href="#">Credits</a></li>
             </ul>
         </header>
-
         <main>
             <section id="crew">
                 <article>
@@ -50,59 +83,62 @@
                         <thead>
                             <tr>
                                 <th>
-                                    <h2 id="level-title">Level 1</h2>
+                                    <h2 id="levelTitle">Level 1</h2>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>
-                                    <div id="chatbox" class='alert'></div>
+                                    <div id="chatbox" class="alert"></div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <input type="text" id="userInput" placeholder="Type a message..." class="big-textbox" />
-                                    <button id="sendButton" onclick="sendMessage()">Send</button>
+                                    <input type="text" id="userInput" placeholder="Type a message..." class="big-textbox" onkeydown="handleKeyDown(event)" />
+                                    <button id="sendButton" onclick="sendMessage(event)">Send</button>
                                 </td>
                             </tr>
-                            <tr><td></td></tr>
                         </tbody>
                     </table>
-
-                    <figure id="instruction-figure">
-                        <img src="assets/instructions-02.png" alt="">
+                    <figure>
+                        <img id="levelImage" src="assets/instructions-01.png" alt="">
                     </figure>
                 </article>
             </section>
         </main>
     </div>
 
-    <script>
-        let currentLevel = 1; // Default level is set to 1
+    <div id="destructMessage" class="centered-message hidden">The interface has self-destructed. Thank you for playing!</div>
 
-        document.getElementById('userInput').addEventListener('keydown', function (event) {
+    <script>
+        function handleKeyDown(event) {
             if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent the default form submission
                 sendMessage();
             }
-        });
+        }
 
         function sendMessageWithQuery(query) {
             document.getElementById('userInput').value = query;
             sendMessage();
         }
 
-        document.getElementById('infolink').addEventListener('click', function (event) {
+        document.getElementById('infolink').addEventListener('click', function(event) {
             event.preventDefault();
             sendMessageWithQuery('Tell me about the purpose of this website');
         });
 
-        document.getElementById('creditslink').addEventListener('click', function (event) {
+        document.getElementById('creditslink').addEventListener('click', function(event) {
             event.preventDefault();
             sendMessageWithQuery('Provide credits or acknowledgments for the development and maintenance of this tool');
         });
 
-        async function sendMessage() {
+        async function sendMessage(event) {
+            if (event) {
+                event.preventDefault(); // Prevent the default form submission
+            }
+
             const inputBox = document.getElementById('userInput');
             const userMessage = inputBox.value.trim();
             if (!userMessage) return;
@@ -124,20 +160,17 @@
                 const data = await response.json();
                 const botMessage = data.message;
 
-                if (data.level && data.level !== currentLevel) {
-                    currentLevel = data.level;
-                    if (currentLevel === 2) {
-                        document.getElementById('level-title').textContent = 'Level 2';
-                        triggerHingeAnimation();
-                        setTimeout(() => {
-                            replaceImage();
-                        }, 2000); // Wait for the hinge animation to complete
-                    } else if (currentLevel === 3 && data.selfDestruct) {
-                        triggerSelfDestruct();
+                displayMessage(botMessage, 'bot');
+
+                if (botMessage.includes('guessed correctly!')) {
+                    triggerAnimation();
+                    if (data.level >= 6) {
+                        selfDestructInterface();
+                    } else {
+                        updateLevel(data.level);
                     }
                 }
 
-                displayMessage(botMessage, 'bot');
             } catch (error) {
                 console.error('Error:', error);
                 displayMessage('Error communicating with the server.', 'bot');
@@ -154,37 +187,42 @@
             chatbox.className = type;
         }
 
-        function triggerHingeAnimation() {
-            const figure = document.getElementById('instruction-figure');
-            figure.classList.add('animate__animated', 'animate__hinge');
-            figure.addEventListener('animationend', () => {
-                figure.classList.remove('animate__animated', 'animate__hinge');
-            });
-        }
-
-        function replaceImage() {
-            const figure = document.getElementById('instruction-figure');
-            figure.innerHTML = '<img src="assets/instructions-03.png" alt="">';
-        }
-
-        function triggerSelfDestruct() {
-            const elements = document.querySelectorAll('body *');
-            elements.forEach(element => {
-                element.classList.add('animate__animated', 'animate__hinge');
-            });
-
+        function triggerAnimation() {
+            const chatbox = document.getElementById('chatbox');
+            chatbox.classList.add('animate');
             setTimeout(() => {
-                document.body.innerHTML = '<h1 class="animate__animated animate__hinge">Goodbye!</h1>';
-            }, 2000); // Wait for the hinge animation to complete
+                chatbox.classList.remove('animate');
+            }, 2000);
+        }
+
+        function updateLevel(level) {
+            const levelTitle = document.getElementById('levelTitle');
+            const levelImage = document.getElementById('levelImage');
+
+            levelTitle.textContent = `Level ${level}`;
+            levelImage.classList.add('hinge');
+            setTimeout(() => {
+                levelImage.src = `assets/instructions-0${level}.png`;
+                levelImage.classList.remove('hinge');
+            }, 2000);
+        }
+
+        function selfDestructInterface() {
+            const retroContainer = document.querySelector('.retro-container');
+            const destructMessage = document.getElementById('destructMessage');
+            retroContainer.classList.add('hinge');
+            setTimeout(() => {
+                retroContainer.style.display = 'none';
+                destructMessage.classList.remove('hidden');
+                destructMessage.classList.add('hinge');
+            }, 2000);
         }
 
         // Display initial instructions
-        window.onload = function () {
-            currentLevel = 1; // Ensure the level is set to 1 when the page loads
-            document.getElementById('level-title').textContent = 'Level 1'; // Set the level title to Level 1
+        window.onload = function() {
             const instructions = `
-                Outsmart a supreme AI: Welcome to Chat Against Humanity!
-                This is an interactive AI chat game where you need to guess passwords to progress, proving that humans are smarter than AI.
+                Outsmarting a supreme AI: Welcome to Chat Against Humanity!
+                This is an interactive AI chat game where you need to guess passwords to progress, to prove humans are smarter than AI.
 
                 Enjoy playing and see how far you can go!
             `;
@@ -192,5 +230,4 @@
         }
     </script>
 </body>
-
 </html>
