@@ -1,2 +1,5 @@
 .env
-node_modules
+images.json
+node_modules/
+task-definition.json
+deploy.sh
