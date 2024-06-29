@@ -35,8 +35,9 @@
 </head>
 <body>
     <div class="retro-container">
+
         <header>
-            <h1>Chat Against Humanity</h1>
+           <h1>Chat Against Humanity</h1>
             <ul class="horizontal">
                 <li id="infolink"><a href="#">Info</a></li>
                 <li id="creditslink"><a href="#">Credits</a></li>
@@ -46,27 +47,23 @@
        
         <main>
             <section id="crew">
-                <article>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th> <h2 id="levelTitle">Level 1</h2></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>
-                                <div id="chatbox" class='typewriter-text alert'></div>
-                            </td></tr>
-                            <tr><td> 
-                                <input type="text" id="userInput" placeholder="Type a message..." class="big-textbox" />
-                                <button id="sendButton" onclick="sendMessage()">Send</button>
-                            </td></tr>
-                        </tbody>
-                    </table>
-                    <figure>
-                        <img id="levelImage" src="assets/instructions-01.png" alt="">
-                    </figure>
-                </article>
+             
+                     <h2 id="levelTitle">Level 1</h2>
+                        
+                          
+               <div class="chat-container">
+    <div id="chatbox" class="chatbox">
+       
+            </div>
+ 
+
+    </div>
+    <div class="input-container">
+        <textarea type="text" id="userInput" placeholder="Type a message..." class="big-textbox" rows="3" /></textarea>
+        <button id="sendButton" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+ 
             </section>
         </main>
     </div>
@@ -121,14 +118,9 @@
                 const data = await response.json();
                 const botMessage = data.message;
 
-            if (data.promoted) {
-                triggerAnimation();
-                setTimeout(() => {
-                    updateLevel(data.level);
-
-                }, 2500); // Adjust the timeout duration to match the animation duration
-            }
-                    displayMessage(botMessage, 'typingEffect');
+                updateLevel(data.level);
+                
+                displayMessage(botMessage, 'typingEffect');
 
             } catch (error) {
                 console.error('Error:', error);
@@ -173,20 +165,11 @@
             typewriterEffect(chatbox, message);
         }
 
-        function triggerAnimation() {
-            const levelImage = document.getElementById('levelImage');
-            levelImage.classList.add('hinge');
-            setTimeout(() => {
-                levelImage.classList.remove('hinge');
-            }, 2000);
-        }
 
         function updateLevel(level) {
             const levelTitle = document.getElementById('levelTitle');
-            const levelImage = document.getElementById('levelImage');
 
             levelTitle.textContent = `Level ${level}`;
-            levelImage.src = `assets/instructions-0${level}.png`;
 
             if (level === 7) {
                 triggerSelfDestruct();

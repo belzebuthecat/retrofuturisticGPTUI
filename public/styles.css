@@ -31,12 +31,21 @@ body {
   box-sizing: inherit;
 }
 
-input, button, textarea, select {
+input, textarea, select {
   font: inherit;
   color: inherit;
   cursor: inherit;
   background-color: inherit;
-  width: -webkit-fill-available;
+  width: fit-content;
+  padding: 10px;
+}
+
+
+ button {
+  font: inherit;
+  color: inherit;
+  cursor: inherit;
+  background-color: inherit;
   padding: 10px;
 }
 
@@ -92,6 +101,9 @@ li:focus-within a {
     border: 0;
 }
 
+textarea:focus {
+    border: 2px; color: --primary-color;
+}
 
 main {
     overflow: hidden;
@@ -159,7 +171,7 @@ article>figure,
 article>div {
     position: relative;
     display: flex;
-    flex-direction: column;
+/*    flex-direction: column; */
     overflow-y: auto;
     height: 100%;
 }
@@ -201,8 +213,8 @@ td {
 
 @media (orientation: portrait) {
     header {
-        flex-direction: column;
-        gap: 0;
+     /*   flex-direction: column; */
+         gap: 0;
     }
 
     ul.horizontal>li {
@@ -211,7 +223,7 @@ td {
 
     article {
         display: flex;
-        flex-direction: column-reverse;
+    
     }
 
     article>figure,
@@ -222,11 +234,33 @@ td {
     }
 }
 
-.big-textbox {
-    text-align: left;
-    padding: 0.2rem 1rem;
-    border: 2px solid; 
+
+/* Container holding the input and button */
+.input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
+
+/* Style for the input box */
+.input-container .big-textbox {
+    flex: 1; /* Take available space */
+    padding: 10px 20px; /* Vertical and horizontal padding */
+    border: 2px solid ; /* Border style */
+    border-radius: 5px; /* Rounded corners */
+    margin-right: 10px; /* Space between input and button */
+
+}
+
+/* Style for the send button */
+.input-container button {
+    padding: 10px 20px;
+    color: --primary-color;
+    border: 2px solid ;
+    border-radius: 5px;
+}
+
 
 .typewriter-text {
     display: inline-block;
@@ -261,4 +295,43 @@ td {
     60% { transform: rotate(80deg); transform-origin: top left; }
     80% { transform: rotate(60deg); transform-origin: top left; }
     100% { transform: rotate(100deg) translateX(100vw); transform-origin: top left; opacity: 0; }
+}
+
+/* Container for the entire chat interface */
+.chat-container {
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 30vh; /* Adjust based on your viewport */
+    max-width: 90%; /* Set a max-width for the chat interface */
+    margin: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Chatbox where messages are displayed */
+.chatbox {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+
+
+
+    textarea {
+      width: 100%;
+      border: none;
+      padding: 10px 20px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      resize: none;
+    }
+
+/* Style to keep chat messages in the center */
+.chatbox {
+    padding-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 }
