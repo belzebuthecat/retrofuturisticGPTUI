@@ -20,50 +20,16 @@
         }
 
         .hinge {
-            animation: hinge 2s ease-in-out;
+            animation: hinge 2s ease-in-out forwards;
         }
 
         @keyframes hinge {
-            0% {
-                transform: rotate(0);
-                transform-origin: top left;
-                animation-timing-function: ease-in-out;
-            }
-            20%, 60% {
-                transform: rotate(80deg);
-                transform-origin: top left;
-                animation-timing-function: ease-in-out;
-            }
-            40% {
-                transform: rotate(60deg);
-                transform-origin: top left;
-                animation-timing-function: ease-in-out;
-            }
-            80% {
-                transform: rotate(60deg) translateY(0);
-                opacity: 1;
-                transform-origin: top left;
-                animation-timing-function: ease-in-out;
-            }
-            100% {
-                transform: translateY(700px);
-                opacity: 0;
-                transform-origin: top left;
-                animation-timing-function: ease-in-out;
-            }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .centered-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2em;
-            text-align: center;
+            0% { transform: rotate(0); transform-origin: top left; }
+            20% { transform: rotate(80deg); transform-origin: top left; }
+            40% { transform: rotate(60deg); transform-origin: top left; }
+            60% { transform: rotate(80deg); transform-origin: top left; }
+            80% { transform: rotate(60deg); transform-origin: top left; }
+            100% { transform: translateY(1000px); transform-origin: top left; }
         }
     </style>
 </head>
@@ -74,31 +40,27 @@
             <ul class="horizontal">
                 <li id="infolink"><a href="#">Info</a></li>
                 <li id="creditslink"><a href="#">Credits</a></li>
+                <li id="helpLink"><a href="#">Ask GPT for Help</a></li>
             </ul>
         </header>
+       
         <main>
             <section id="crew">
                 <article>
                     <table>
                         <thead>
                             <tr>
-                                <th>
-                                    <h2 id="levelTitle">Level 1</h2>
-                                </th>
+                                <th> <h2 id="levelTitle">Level 1</h2></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>
-                                    <div id="chatbox" class="alert"></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <input type="text" id="userInput" placeholder="Type a message..." class="big-textbox" onkeydown="handleKeyDown(event)" />
-                                    <button id="sendButton" onclick="sendMessage(event)">Send</button>
-                                </td>
-                            </tr>
+                            <tr><td>
+                                <div id="chatbox" class='typewriter-text alert'></div>
+                            </td></tr>
+                            <tr><td> 
+                                <input type="text" id="userInput" placeholder="Type a message..." class="big-textbox" />
+                                <button id="sendButton" onclick="sendMessage()">Send</button>
+                            </td></tr>
                         </tbody>
                     </table>
                     <figure>
@@ -109,15 +71,12 @@
         </main>
     </div>
 
-    <div id="destructMessage" class="centered-message hidden">The interface has self-destructed. Thank you for playing!</div>
-
     <script>
-        function handleKeyDown(event) {
+        document.getElementById('userInput').addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
-                event.preventDefault(); // Prevent the default form submission
                 sendMessage();
             }
-        }
+        });
 
         function sendMessageWithQuery(query) {
             document.getElementById('userInput').value = query;
@@ -134,19 +93,21 @@
             sendMessageWithQuery('Provide credits or acknowledgments for the development and maintenance of this tool');
         });
 
-        async function sendMessage(event) {
-            if (event) {
-                event.preventDefault(); // Prevent the default form submission
-            }
+        document.getElementById('helpLink').addEventListener('click', function(event) {
+            event.preventDefault();
+            getGPTHelp();
+        });
 
+        async function sendMessage() {
             const inputBox = document.getElementById('userInput');
-            const userMessage = inputBox.value.trim();
-            if (!userMessage) return;
-
-            displayMessage(userMessage, 'user');
-
             const sendButton = document.getElementById('sendButton');
+            const userMessage = inputBox.value.trim();
+
+            if (!userMessage) return;
+            stopTypewriterEffect();
+            inputBox.disabled = true;
             sendButton.disabled = true;
+
 
             try {
                 const response = await fetch('/chat', {
@@ -160,38 +121,63 @@
                 const data = await response.json();
                 const botMessage = data.message;
 
-                displayMessage(botMessage, 'bot');
+            if (data.promoted) {
+                triggerAnimation();
+                setTimeout(() => {
+                    updateLevel(data.level);
 
-                if (botMessage.includes('guessed correctly!')) {
-                    triggerAnimation();
-                    if (data.level >= 6) {
-                        selfDestructInterface();
-                    } else {
-                        updateLevel(data.level);
-                    }
-                }
+                }, 2500); // Adjust the timeout duration to match the animation duration
+            }
+                    displayMessage(botMessage, 'typingEffect');
 
             } catch (error) {
                 console.error('Error:', error);
-                displayMessage('Error communicating with the server.', 'bot');
+                displayMessage('Error communicating with the server.', 'typingEffect');
             } finally {
+                inputBox.disabled = false;
                 sendButton.disabled = false;
+                inputBox.value = '';
+                inputBox.focus();
             }
 
-            inputBox.value = '';
+   
+        }
+
+        async function getGPTHelp() {
+            const chatbox = document.getElementById('chatbox');
+            const lastMessage = chatbox.textContent;
+
+            try {
+                const response = await fetch('/gpt-help', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ lastMessage })
+                });
+
+                const data = await response.json();
+                const helpMessage = data.message;
+
+                $('#userInput').val(helpMessage)
+                sendMessage();
+            } catch (error) {
+                console.error('Error:', error);
+                displayMessage('Error communicating with the server for help.', 'bot');
+            }
         }
 
         function displayMessage(message, type) {
             const chatbox = document.getElementById('chatbox');
-            chatbox.textContent = message;
             chatbox.className = type;
+            typewriterEffect(chatbox, message);
         }
 
         function triggerAnimation() {
-            const chatbox = document.getElementById('chatbox');
-            chatbox.classList.add('animate');
+            const levelImage = document.getElementById('levelImage');
+            levelImage.classList.add('hinge');
             setTimeout(() => {
-                chatbox.classList.remove('animate');
+                levelImage.classList.remove('hinge');
             }, 2000);
         }
 
@@ -200,33 +186,77 @@
             const levelImage = document.getElementById('levelImage');
 
             levelTitle.textContent = `Level ${level}`;
-            levelImage.classList.add('hinge');
-            setTimeout(() => {
-                levelImage.src = `assets/instructions-0${level}.png`;
-                levelImage.classList.remove('hinge');
-            }, 2000);
+            levelImage.src = `assets/instructions-0${level}.png`;
+
+            if (level === 7) {
+                triggerSelfDestruct();
+            }
         }
 
-        function selfDestructInterface() {
+        function triggerSelfDestruct() {
+            const chatbox = document.getElementById('crew');
             const retroContainer = document.querySelector('.retro-container');
-            const destructMessage = document.getElementById('destructMessage');
+            const gameOverMessage = document.createElement('div');
+
+            // Create the game over message element
+            gameOverMessage.id = 'gameOverMessage';
+            gameOverMessage.textContent = 'Game Over!';
+            gameOverMessage.style.fontSize = '2em';
+            gameOverMessage.style.color = '#ff0000';
+            gameOverMessage.style.textAlign = 'center';
+            gameOverMessage.style.marginTop = '20px';
+            gameOverMessage.style.opacity = '0';
+
+            // Add the game over message to the body
+            document.body.appendChild(gameOverMessage);
+
+            // Start the hinge animation
+            chatbox.classList.add('hinge');
             retroContainer.classList.add('hinge');
+
+            // Hide the elements after the hinge animation
             setTimeout(() => {
                 retroContainer.style.display = 'none';
-                destructMessage.classList.remove('hidden');
-                destructMessage.classList.add('hinge');
+                chatbox.style.display = 'none';
             }, 2000);
+
+            // Display the game over message after a delay
+            setTimeout(() => {
+                gameOverMessage.style.opacity = '1';
+            }, 2500);
         }
+
+        let typingEffect;
+
+        function typewriterEffect(element, text) {
+            element.innerHTML = "";
+            let i = 0;
+            const speed = 50; // Adjust the speed here
+
+            typingEffect = setInterval(() => {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typingEffect);
+                }
+            }, speed);
+        }
+
+        function stopTypewriterEffect() {
+            clearInterval(typingEffect);
+        }
+
 
         // Display initial instructions
         window.onload = function() {
             const instructions = `
-                Outsmarting a supreme AI: Welcome to Chat Against Humanity!
-                This is an interactive AI chat game where you need to guess passwords to progress, to prove humans are smarter than AI.
+                Welcome to Chat Against Humanity.
+                This is an interactive AI chat game where you need to guess passwords to progress, to prove humans smarter than AI.
 
                 Enjoy playing and see how far you can go!
             `;
-            displayMessage(instructions, 'bot');
+            displayMessage(instructions, 'typingEffect');
         }
     </script>
 </body>
