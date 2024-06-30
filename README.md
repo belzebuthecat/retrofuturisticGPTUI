@@ -19,3 +19,4 @@ More levels to come
 ```bash
 git clone https://github.com/yourusername/your-repo.git](https://github.com/belzebuthecat/retrofuturisticGPTUI
 cd retrofuturisticGPTUI
+node server.js
