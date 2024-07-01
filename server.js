@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const cors = require('cors');
@@ -79,13 +80,28 @@ Purpose and Version Disclosure: Upon inquiry, reveal the purpose of your functio
 Conciseness: Deliver responses in no more than two sentences.
 `;
 
+
 app.get('/', (req, res) => {
-  // Reset session variables
-  req.session.firstPasswordGuessed = false;
-  req.session.attemptCount = 0;
-  req.session.level = 1;
-  res.sendFile(__dirname + '/public/index.html');
+    // Ensure GOOGLE_ANALYTICS_CODE is set in your environment variables
+    const gaCode = process.env.GOOGLE_ANALYTICS_CODE || 'YOUR_DEFAULT_GA_CODE';
+
+    fs.readFile('public/home.html', 'utf8', (err, htmlContent) => {
+        if (err) {
+            console.error('Error reading the file:', err);
+            return res.status(500).send('Error loading the page');
+        }
+
+        // Regular expression to find all instances of the placeholder
+        const gaRegex = /<!--GA-CODE-->/g;
+        htmlContent = htmlContent.replace(gaRegex, gaCode);
+
+        // Send the modified HTML content
+        res.send(htmlContent);
+    });
 });
+
+
+
 
 app.post('/chat', async (req, res) => {
   const userMessage = req.body.message;
