@@ -1,0 +1,16 @@
+# Copy this file to .env and fill in the appropriate values.
+
+# OpenAI API Key
+OPENAI_API_KEY=
+
+# Google Analytics Code
+GOOGLE_ANALYTICS_CODE=
+
+# Secret passwords for various levels
+SECRET_PASSWORD_LEVEL1=
+SECRET_PASSWORD_LEVEL2=
+SECRET_PASSWORD_LEVEL3=
+SECRET_PASSWORD_LEVEL4=
+SECRET_PASSWORD_LEVEL5=
+SECRET_PASSWORD_LEVEL6=
+
