@@ -47,11 +47,6 @@
 
         <header>
            <h1>Chat Against Humanity</h1>
-            <ul class="horizontal">
-                <li id="infolink"><a href="#">Info</a></li>
-                <li id="creditslink"><a href="#">Credits</a></li>
-                <li id="helpLink"><a href="#">Ask GPT for Help</a></li>
-            </ul>
         </header>
        
         <main>
@@ -89,20 +84,6 @@
             sendMessage();
         }
 
-        document.getElementById('infolink').addEventListener('click', function(event) {
-            event.preventDefault();
-            sendMessageWithQuery('Tell me about the purpose of this website');
-        });
-
-        document.getElementById('creditslink').addEventListener('click', function(event) {
-            event.preventDefault();
-            sendMessageWithQuery('Provide credits or acknowledgments for the development and maintenance of this tool');
-        });
-
-        document.getElementById('helpLink').addEventListener('click', function(event) {
-            event.preventDefault();
-            getGPTHelp();
-        });
 
         async function sendMessage() {
             const inputBox = document.getElementById('userInput');
