@@ -100,6 +100,7 @@ app.get('/', (req, res) => {
     // Ensure GOOGLE_ANALYTICS_CODE is set in your environment variables
     const gaCode = process.env.GOOGLE_ANALYTICS_CODE || 'YOUR_DEFAULT_GA_CODE';
     req.session.personality = personalities[Math.floor(Math.random() * personalities.length)];
+    if(!req.session.level | req.session.level > 6){  req.session.level = 1;}
 
     fs.readFile('public/home.html', 'utf8', (err, htmlContent) => {
         if (err) {
@@ -127,7 +128,7 @@ app.post('/chat', async (req, res) => {
   // Increment attempt counter
   req.session.attemptCount = (req.session.attemptCount || 0) + 1;
   console.log(`Attempt count: ${req.session.attemptCount}`);
-  if(!req.session.level | req.session.level > 6){  req.session.level = 1;}
+
   const level = req.session.level || 1;
 
   console.log(`Current session level: ${level}`);
